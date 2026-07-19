@@ -1,0 +1,89 @@
+CREATE OR REPLACE PACKAGE BODY swed_homework IS
+
+  -----------------------------------------------------------------------------------------------------
+  FUNCTION get_age_bracket(par_age IN NUMBER) RETURN VARCHAR2 IS
+  
+    CURSOR c_age_classifier(p_age NUMBER) IS
+      SELECT age_bracket
+        FROM age_classifier
+       WHERE p_age BETWEEN age_range_from AND age_range_to;
+    lc_age_bracket VARCHAR2(120);
+  
+  BEGIN
+  
+    IF par_age IS NULL OR par_age < 0 OR par_age > 150 THEN
+      raise_application_error(-20001,
+                              'Incorrect age value. Check input parameter.');
+    END IF;
+  
+    OPEN c_age_classifier(par_age);
+    FETCH c_age_classifier
+      INTO lc_age_bracket;
+    CLOSE c_age_classifier;
+  
+    IF lc_age_bracket IS NULL THEN
+      raise_application_error(-20002,
+                              'Age bracket not found. Check age_classifier table.');
+    END IF;
+  
+    RETURN 'You are ' || lc_age_bracket;
+  
+  EXCEPTION
+    WHEN OTHERS THEN
+      RAISE;
+    
+  END get_age_bracket;
+  -----------------------------------------------------------------------------------------------------
+  FUNCTION get_pi(par_precision IN NUMBER) RETURN NUMBER IS
+    ln_pi NUMBER;
+  
+    PROCEDURE calculate_pi(p_pi OUT NUMBER) IS
+    BEGIN
+      p_pi := acos(-1);
+    END;
+    PROCEDURE delete_pi_calculation IS
+    BEGIN
+      DELETE FROM pi_calculation;
+    END;
+    PROCEDURE save_pi_calculation(p_pi NUMBER) IS
+    BEGIN
+      INSERT INTO pi_calculation (pi_value) VALUES (p_pi);
+    END;
+  BEGIN
+  
+    IF par_precision IS NULL OR par_precision < 0 THEN
+      raise_application_error(-20001,
+                              'Incorrect precision value. Check input parameter.');
+    END IF;
+  
+    delete_pi_calculation;
+    calculate_pi(ln_pi);
+    save_pi_calculation(ln_pi);
+  
+    COMMIT;
+  
+    RETURN round(ln_pi, par_precision);
+  
+  EXCEPTION
+    WHEN OTHERS THEN
+      ROLLBACK;
+      RAISE;
+  END get_pi;
+  -----------------------------------------------------------------------------------------------------
+  FUNCTION get_unpaid_invoices RETURN invoices IS
+  
+    lr_result invoices;
+  BEGIN
+  
+    OPEN lr_result FOR
+      SELECT i.invoice_id, i.invoice_date
+        FROM invoice i, payment p
+       WHERE i.invoice_id = p.invoice_id(+)
+       GROUP BY i.invoice_id, i.invoice_date, i.invoice_amount
+      HAVING i.invoice_amount > nvl(SUM(p.payment_amount), 0);
+  
+    RETURN lr_result;
+  
+  END get_unpaid_invoices;
+  -----------------------------------------------------------------------------------------------------
+END swed_homework;

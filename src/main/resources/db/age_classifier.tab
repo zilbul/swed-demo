@@ -1,0 +1,20 @@
+create table age_classifier
+(
+  age_id number not null,
+  age_bracket varchar2(100) not null,
+  age_range_from number not null,
+  age_range_to number not null,
+  constraint age_pk primary key (age_id)
+)
+/
+insert into age_classifier(age_id,age_bracket,age_range_from,age_range_to)values  (1, 'infant',0,6)
+/
+insert into age_classifier(age_id,age_bracket,age_range_from,age_range_to)values (2, 'schoolchild',7,17)
+/
+insert into age_classifier(age_id,age_bracket,age_range_from,age_range_to)values (3, 'adult',18,39)
+/
+insert into age_classifier(age_id,age_bracket,age_range_from,age_range_to)values (4, 'middle-aged',40,54)
+/
+insert into age_classifier(age_id,age_bracket,age_range_from,age_range_to)values (5, 'aged',55,999)
+/
+
