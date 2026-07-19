@@ -1,0 +1,9 @@
+4. Oracle form modernization
+
+a) Oracle PL/SQL -> JAVA REST API -> JAVASCRIPT
+b)
+c) All business logic on DB side. Create all functionality in a core schema. Make wrappers in a schema for external systems/users. Java acts only as an intermediatory to make services that web/mobile/other apps can access.
+d) Oracle forms are quite outdated and should
+e) Data modification functionality, business logic.
+f) All UI specific functionality.
+g) Oracle forms are quite outdated in general and UI functionality, should not be migrated 1 to 1. Forms can also hide complex logic behind form/datablock/item level triggers or libraries. 
